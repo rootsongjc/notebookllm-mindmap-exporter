@@ -89,6 +89,20 @@ def parse_mindmap(html_path, md_path):
     with open(md_path, 'w', encoding='utf-8') as f:
         f.write('\n'.join(md_lines))
 
+    # 统计信息输出
+    total_nodes = len(all_names)
+    normal_nodes = len(output_names)
+    missing_nodes = len(missing_names)
+    success_rate = normal_nodes / total_nodes * 100 if total_nodes else 0
+    print(f"共发现节点数：{total_nodes}")
+    print(f"正常递归节点数：{normal_nodes}")
+    print(f"无法判断 parent 追加到文档最后的节点数：{missing_nodes}")
+    print(f"判断成功率：{success_rate:.2f}%")
+    if missing_names:
+        print("追加到文档最后的节点：")
+        for n in missing_names:
+            print(f"  - {n}")
+
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("用法：python parse_mindmap.py 输入.html 输出.md")
