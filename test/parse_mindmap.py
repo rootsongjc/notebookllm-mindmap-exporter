@@ -12,12 +12,20 @@ def parse_mindmap(html_path, md_path):
     with open(html_path, 'r', encoding='utf-8') as f:
         soup = BeautifulSoup(f, 'html.parser')
 
-    # 提取所有节点及其坐标
+    # 提取所有节点及其坐标和颜色
     nodes = {}       # (x,y) -> name
     positions = {}   # name -> (x,y)
+    colors = {}      # name -> color
     for g in soup.find_all('g', class_='node'):
         transform = g.get('transform', '')
         name_tag = g.find('text', class_='node-name')
+        color = None
+        # 尝试从 <rect> 或 <circle> 或 <text> 获取 fill 属性
+        shape = g.find(['rect', 'circle'])
+        if shape and shape.has_attr('fill'):
+            color = shape['fill']
+        elif name_tag and name_tag.has_attr('fill'):
+            color = name_tag['fill']
         if transform and name_tag:
             m = re.search(r'translate\(([-\d.]+),\s*([-\d.]+)\)', transform)
             if m:
@@ -25,6 +33,7 @@ def parse_mindmap(html_path, md_path):
                 name = name_tag.get_text(strip=True)
                 nodes[(x, y)] = name
                 positions[name] = (x, y)
+                colors[name] = color
 
     # 提取所有连线，建立父子映射
     tree = defaultdict(list)
@@ -47,14 +56,35 @@ def parse_mindmap(html_path, md_path):
     roots = set(tree.keys()) - children
     root = roots.pop() if roots else next(iter(positions.keys()))
 
-    # 递归生成 Markdown
+    # 统计所有已知 parent 节点的颜色和层级
+    node_levels = {}
     def dfs(name, level):
+        node_levels[name] = level
         lines = [f"{'#'*level} {name}"]
         for child in tree.get(name, []):
             lines.extend(dfs(child, level+1))
         return lines
 
     md_lines = dfs(root, 1)
+
+    # 检查未输出的节点
+    all_names = set(positions.keys())
+    output_names = set(node_levels.keys())
+    missing_names = all_names - output_names
+    # 建立颜色到 level 的映射
+    color2level = defaultdict(list)
+    for n, lvl in node_levels.items():
+        if colors.get(n):
+            color2level[colors[n]].append(lvl)
+    for name in missing_names:
+        color = colors.get(name)
+        # 取同色节点的最小 level，否则为 1
+        if color and color2level.get(color):
+            level = min(color2level[color])
+        else:
+            level = 1
+        md_lines.append(f"{'#'*level} {name}")
+
     # 写入文件
     with open(md_path, 'w', encoding='utf-8') as f:
         f.write('\n'.join(md_lines))
