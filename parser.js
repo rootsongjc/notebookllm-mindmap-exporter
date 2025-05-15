@@ -41,11 +41,44 @@
 
   const root = Object.keys(tree).find(k => !children.has(k)) || Object.keys(positions)[0];
 
-  const dfs = (node, level = 1) => {
+  // 统计信息和 markdown 递归共用一个 dfs
+  const allNames = new Set(Object.keys(positions));
+  const outputNames = new Set();
+  const nodeLevels = {};
+  function dfs(node, level = 1) {
+    nodeLevels[node] = level;
+    outputNames.add(node);
     const lines = [`${'#'.repeat(level)} ${node}`];
     for (const child of tree[node] || []) lines.push(...dfs(child, level+1));
     return lines;
+  }
+  let mdLines = dfs(root, 1);
+  // 计算所有未被递归到的节点（allNames - outputNames）
+  const missingNames = Array.from(allNames).filter(n => !outputNames.has(n));
+  // 建立颜色到 level 的映射
+  const color2level = {};
+  Object.entries(nodeLevels).forEach(([n, lvl]) => {
+    if (typeof colors !== 'undefined' && colors[n]) {
+      if (!color2level[colors[n]]) color2level[colors[n]] = [];
+      color2level[colors[n]].push(lvl);
+    }
+  });
+  // 补充所有未被递归到的节点
+  missingNames.forEach(name => {
+    if (!mdLines.some(line => line.endsWith(` ${name}`))) { // 避免重复
+      const color = typeof colors !== 'undefined' ? colors[name] : null;
+      let level = 1;
+      if (color && color2level[color]) {
+        level = Math.min(...color2level[color]);
+      }
+      mdLines.push(`${'#'.repeat(level)} ${name}`);
+    }
+  });
+  window.markdown = mdLines.join('\n');
+  window.exportStats = {
+    total: allNames.size,
+    normal: outputNames.size,
+    missing: missingNames.length,
+    missingNames: missingNames
   };
-
-  window.markdown = dfs(root).join('\n');
 })();

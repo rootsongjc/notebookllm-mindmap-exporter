@@ -36,11 +36,10 @@ const exportMarkdown = () => {
         chrome.scripting.executeScript({
           target: { tabId: tabs[0].id },
           func: () => {
-            if (window.markdown) {
-              return { markdown: window.markdown };
-            } else {
-              return { error: 'Failed to generate Markdown content' };
-            }
+            return {
+              markdown: window.markdown,
+              stats: window.exportStats
+            };
           }
         }).then(results => {
           if (!results[0].result || results[0].result.error) {
@@ -51,6 +50,18 @@ const exportMarkdown = () => {
           const url = URL.createObjectURL(blob);
           const filename = getExportFilename('md', rootName);
           chrome.runtime.sendMessage({ type: 'download', url, filename });
+
+          // 弹窗显示详情
+          const stats = results[0].result.stats;
+          if (stats) {
+            alert(
+              `导出完成！\n` +
+              `节点总数：${stats.total}\n` +
+              `正常递归节点数：${stats.normal}\n` +
+              `无法判断parent追加节点数：${stats.missing}` +
+              (stats.missingNames && stats.missingNames.length > 0 ? `\n追加节点：${stats.missingNames.join(', ')}` : '')
+            );
+          }
         });
       });
     });
