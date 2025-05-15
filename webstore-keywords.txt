@@ -1,0 +1,1 @@
+export, mindmap, markdown, svg, collapsible, interactive, mind map, diagram, notebookllm, exporter, chrome extension, productivity, visualization, outline, tree, knowledge, notes, education, learning, web, tool

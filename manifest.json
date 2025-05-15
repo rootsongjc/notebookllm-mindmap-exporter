@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Mindmap Exporter",
+  "version": "1.2",
+  "description": "Export mindmaps from any web page as Markdown or interactive SVG with collapsible nodes.",
+  "permissions": ["activeTab", "scripting", "downloads"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Export Mindmap",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "icon.png",
+    "32": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "homepage_url": "https://github.com/rootsongjc/notebookllm-mindmap-exporter",
+  "short_name": "MindmapExporter"
+}
