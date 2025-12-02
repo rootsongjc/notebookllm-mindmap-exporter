@@ -42,27 +42,34 @@ const exportMarkdown = () => {
             };
           }
         }).then(results => {
-          if (!results[0].result || results[0].result.error) {
-            alert(results[0].result.error || 'Export failed');
-            return;
-          }
-          const blob = new Blob([results[0].result.markdown], { type: 'text/markdown' });
-          const url = URL.createObjectURL(blob);
-          const filename = getExportFilename('md', rootName);
-          alert(filename);
-          chrome.runtime.sendMessage({ type: 'download', url, filename });
+           if (!results[0].result || results[0].result.error) {
+             alert(results[0].result.error || 'Export failed');
+             return;
+           }
+           const blob = new Blob([results[0].result.markdown], { type: 'text/markdown' });
+           const filename = getExportFilename('md', rootName);
+           
+           // Create download link directly in popup
+           const url = URL.createObjectURL(blob);
+           const a = document.createElement('a');
+           a.href = url;
+           a.download = filename;
+           document.body.appendChild(a);
+           a.click();
+           document.body.removeChild(a);
+           URL.revokeObjectURL(url);
 
-          // Show details in popup
-           const stats = results[0].result.stats;
-           if (stats) {
-             alert(
-               `Export completed!\n` +
-               `Total nodes: ${stats.total}\n` +
-               `Normal: ${stats.normal}\n` +
-               `Missing parents: ${stats.missing}` +
-               (stats.missingNames && stats.missingNames.length > 0 ? `\nAdded nodes: ${stats.missingNames.join(', ')}` : '')
-             );
-          }
+           // Show details in popup
+            const stats = results[0].result.stats;
+            if (stats) {
+              alert(
+                `Export completed!\n` +
+                `Total nodes: ${stats.total}\n` +
+                `Normal: ${stats.normal}\n` +
+                `Missing parents: ${stats.missing}` +
+                (stats.missingNames && stats.missingNames.length > 0 ? `\nAdded nodes: ${stats.missingNames.join(', ')}` : '')
+              );
+           }
         });
       });
     });
@@ -121,9 +128,17 @@ const exportSVG = () => {
           return;
         }
         const blob = new Blob([results[0].result.svgContent], { type: 'image/svg+xml' });
-        const url = URL.createObjectURL(blob);
         const filename = getExportFilename('svg', rootName);
-        chrome.runtime.sendMessage({ type: 'download', url, filename });
+        
+        // Create download link directly in popup
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
       });
     });
   });
