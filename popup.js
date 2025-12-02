@@ -7,7 +7,7 @@ function getRootNodeName(callback) {
         if (!mindmap) return { error: 'No element with class="mindmap" found' };
         // Use the first node-name as root
         const root = mindmap.querySelector('text.node-name');
-        return { rootName: root ? root.textContent.trim() : 'unknown' };
+        return { rootName: root ? root.textContent.trim().replace(/:/g, ' -') : 'unknown' };
       }
     }).then(results => {
       if (!results[0].result || results[0].result.error) {
@@ -49,18 +49,19 @@ const exportMarkdown = () => {
           const blob = new Blob([results[0].result.markdown], { type: 'text/markdown' });
           const url = URL.createObjectURL(blob);
           const filename = getExportFilename('md', rootName);
+          alert(filename);
           chrome.runtime.sendMessage({ type: 'download', url, filename });
 
-          // 弹窗显示详情
-          const stats = results[0].result.stats;
-          if (stats) {
-            alert(
-              `导出完成！\n` +
-              `节点总数：${stats.total}\n` +
-              `正常递归节点数：${stats.normal}\n` +
-              `无法判断parent追加节点数：${stats.missing}` +
-              (stats.missingNames && stats.missingNames.length > 0 ? `\n追加节点：${stats.missingNames.join(', ')}` : '')
-            );
+          // Show details in popup
+           const stats = results[0].result.stats;
+           if (stats) {
+             alert(
+               `Export completed!\n` +
+               `Total nodes: ${stats.total}\n` +
+               `Normal: ${stats.normal}\n` +
+               `Missing parents: ${stats.missing}` +
+               (stats.missingNames && stats.missingNames.length > 0 ? `\nAdded nodes: ${stats.missingNames.join(', ')}` : '')
+             );
           }
         });
       });
