@@ -1,13 +1,14 @@
-Mindmap Exporter is a Chrome extension that allows you to export mindmaps from any web page as Markdown or interactive SVG files with collapsible/expandable nodes.
+Mindmap Exporter is a Chrome extension that allows you to export NotebookLM mindmaps as Markdown or standalone SVG files.
 
 Features:
 - Export mindmaps as Markdown for easy editing and sharing
-- Export mindmaps as interactive SVG with collapsible/expandable nodes
+- Export mindmaps as standalone SVG files
+- Choose how many levels are exported as Markdown headings before switching to bullet lists
 - Automatically names files as notebookllm-{root-node-name}-{timestamp}.md/svg
 - Simple and modern popup UI
 
 How to use:
-1. Open a web page containing a mindmap (with class="mindmap").
+1. Open a NotebookLM notebook and display a mindmap artifact.
 2. Click the Mindmap Exporter extension icon.
 3. Click "Export as Markdown" or "Export as SVG" in the popup.
 

@@ -40,6 +40,26 @@
       color: #222;
       font-weight: 600;
     }
+    .field {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: #5b6470;
+      margin-bottom: 4px;
+    }
+    .field input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 10px;
+      font-size: 14px;
+      border: 1px solid #d7dde5;
+      border-radius: 6px;
+      background: #fff;
+      color: #222;
+    }
     button {
       padding: 8px 0;
       margin: 6px 0;
@@ -62,9 +82,14 @@
   <div class="popup-container">
     <img src="icon.png" class="popup-logo" alt="Mindmap Exporter logo">
     <h2>Export Mindmap</h2>
+    <div class="field">
+      <label for="headingDepthLimit">Use headings through depth</label>
+      <input id="headingDepthLimit" type="number" min="1" max="6" step="1" value="2">
+    </div>
     <button id="exportMarkdown">Export as Markdown</button>
     <button id="exportSVG">Export as SVG</button>
   </div>
+  <script src="mindmap-contract.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

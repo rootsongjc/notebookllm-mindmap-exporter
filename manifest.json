@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Mindmap Exporter",
   "version": "1.0.0",
-  "description": "Export mindmaps from any web page as Markdown or interactive SVG with collapsible nodes.",
+  "description": "Export NotebookLM mindmaps as Markdown or standalone SVG.",
   "permissions": ["activeTab", "scripting", "downloads"],
   "host_permissions": ["<all_urls>"],
   "background": {
